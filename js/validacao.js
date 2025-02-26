@@ -54,13 +54,24 @@ const mensagensDeErro = {
     },
     estado: {
         valueMissing: 'O campo de estado não pode estar vazio.'
+    },
+    telefone: {
+        valueMissing: 'O campo telefone não pode estar vazio.',
+        patternMismatch: 'O telefone digitado não está no formato correto. Use (XX) XXXXX-XXXX ou (XX) XXXX-XXXX.',
+        customError: 'O DDD informado não é válido.'
+    },
+    instagram: {
+        valueMissing: 'O campo Instagram não pode estar vazio.',
+        customError: 'O nome de usuário do Instagram deve começar com "@".'
     }
 }
 
 const validadores = {
     dataNascimento:input => validaDataNascimento(input),
     cpf:input => validaCPF(input),
-    cep:input => recuperarCEP(input)
+    cep:input => recuperarCEP(input),
+    telefone:input => validaTelefone(input),
+    instagram: input => validaInstagram(input)
 }
 
 function mostraMensagemDeErro(tipoDeInput, input) {
@@ -194,4 +205,40 @@ function preencheCamposComCEP(data) {
     logradouro.value = data.logradouro
     cidade.value = data.localidade
     estado.value = data.uf
+}
+
+// Adicionando Validação ao Telefone
+function validaTelefone(input) {
+    const telefoneFormatado = input.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+    let mensagem = '';
+
+    // Verifica se o campo está vazio
+    if (input.validity.valueMissing) {
+        mensagem = 'O campo telefone não pode estar vazio.';
+    } 
+    // Verifica o tamanho do número
+    else if (telefoneFormatado.length !== 11) { // Considerando apenas números de celular com 11 dígitos
+        mensagem = 'O número de telefone deve ter 11 dígitos (incluindo o DDD).';
+    } 
+    else if (!/^([1-9]{2})/.test(telefoneFormatado)) { // DDD deve começar com 11 a 99
+        mensagem = 'O DDD informado não é válido.';
+    }
+
+    input.setCustomValidity(mensagem);
+}
+
+function validaInstagram(input) {
+    const valor = input.value.trim(); // Remove espaços em branco extras
+    let mensagem = '';
+
+    // Verifica se o campo está vazio
+    if (input.validity.valueMissing) {
+        mensagem = 'O campo Instagram não pode estar vazio.';
+    } 
+    // Verifica se o nome de usuário começa com @
+    else if (!valor.startsWith('@')) {
+        mensagem = 'O nome de usuário do Instagram deve começar com "@".';
+    }
+
+    input.setCustomValidity(mensagem);
 }
